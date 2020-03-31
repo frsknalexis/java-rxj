@@ -20,11 +20,11 @@ import reactor.core.publisher.Mono;
 public class ProductoServiceImpl implements ProductoService {
 	
 	@Autowired
-	private WebClient webClient;
+	private WebClient.Builder webClient;
 
 	@Override
 	public Flux<Producto> findAll() {
-		Flux<Producto> productos = webClient.get()
+		Flux<Producto> productos = webClient.build().get()
 					.accept(MediaType.APPLICATION_JSON)
 					.exchange()
 					.flatMapMany((response) -> {
@@ -36,7 +36,7 @@ public class ProductoServiceImpl implements ProductoService {
 
 	@Override
 	public Mono<Producto> findById(String id) {
-		Mono<Producto> producto = webClient.get()
+		Mono<Producto> producto = webClient.build().get()
 					.uri("/{id}", Collections.singletonMap("id", id))
 					.accept(MediaType.APPLICATION_JSON)
 					.exchange()
@@ -50,7 +50,7 @@ public class ProductoServiceImpl implements ProductoService {
 	@Override
 	public Mono<Producto> saveProducto(Producto producto) {
 		
-		Mono<Producto> p = webClient.post()
+		Mono<Producto> p = webClient.build().post()
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON)
 					.body(BodyInserters.fromValue(producto))
@@ -65,7 +65,7 @@ public class ProductoServiceImpl implements ProductoService {
 
 	@Override
 	public Mono<Producto> updateProducto(Producto producto, String id) {
-		Mono<Producto> p = webClient.put()
+		Mono<Producto> p = webClient.build().put()
 					.uri("/{id}", Collections.singletonMap("id", id))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON)
@@ -80,7 +80,7 @@ public class ProductoServiceImpl implements ProductoService {
 
 	@Override
 	public Mono<Void> deleteProducto(String id) {
-		return webClient.delete()
+		return webClient.build().delete()
 					.uri("/{id}", Collections.singletonMap("id", id))
 					.exchange()
 					.then();
@@ -93,7 +93,7 @@ public class ProductoServiceImpl implements ProductoService {
 				.headers((h) -> {
 					h.setContentDispositionFormData("file", file.filename());
 				});
-		return webClient.post()
+		return webClient.build().post()
 				.uri("/upload/{id}", Collections.singletonMap("id", id))
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON)
